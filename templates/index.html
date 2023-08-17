@@ -1,1 +1,52 @@
-asdf
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stopwatches Web App</title>
+</head>
+<body>
+    <h2>WE ARE ALL ON A PATH TO BECOMING BETTER MATHEMATICIANS</h2>
+    <form method="post" action="/add_timer">
+        <label for="name">Name Of Reformed Individual:</label>
+        <input type="text" id="name" name="name" required><br>
+        <label for="start_date">Start Date and Time:</label>
+        <input type="datetime-local" id="start_date" name="start_date" required><br>
+        <button type="submit">Add Timer</button>
+    </form>
+<ul id="timer-list">
+
+</ul>
+
+    <script>
+    function updateTimers() {
+        var timers = [
+            {% for timer in timers %}
+                { 'name': "{{ timer['name'] }}", 'start_date': new Date("{{ timer['start_date'] }}") },
+            {% endfor %}
+        ];
+
+        var timerList = document.getElementById("timer-list");
+        timerList.innerHTML = "";
+
+        for (var i = 0; i < timers.length; i++) {
+            var timer = timers[i];
+            var timeDiff = new Date() - timer.start_date;
+            var days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            timeDiff -= days * (1000 * 60 * 60 * 24);
+            var hours = Math.floor(timeDiff / (1000 * 60 * 60));
+            timeDiff -= hours * (1000 * 60 * 60);
+            var minutes = Math.floor(timeDiff / (1000 * 60));
+            timeDiff -= minutes * (1000 * 60);
+            var seconds = Math.floor(timeDiff / 1000);
+
+            var formattedTime = days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
+
+            var listItem = document.createElement("li");
+            listItem.textContent = timer.name + ": " + formattedTime;
+            timerList.appendChild(listItem);
+        }
+    }
+
+    setInterval(updateTimers, 1000);
+    </script>
+</body>
+</html>
