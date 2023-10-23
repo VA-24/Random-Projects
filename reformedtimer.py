@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, flash
 import datetime
 import time
 
+#web app for tracking good habits
 app = Flask(__name__)
 app.secret_key = 'xyz'
 timers = []
