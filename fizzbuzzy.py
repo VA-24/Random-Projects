@@ -155,12 +155,12 @@ def run():
     @bot.command()
     async def rules(ctx):
         await ctx.send('rules for fizzbuzz: https://media.discordapp.net/attachments/1167631521193152523/1170593298793119834/IMG_9764.jpg?width=556&height=741')
-        await ctx.send('to play the game, type whatever buzz words apply to the number in chat (order doesnt matter). if ur right, the bot will continue; if ur wrong, the game will reset. you win once you hit 999. SPELLING MATTERS')
+        await ctx.send('to play the game, type whatever buzz words apply to the number in chat (order doesnt matter). if ur right, the bot will continue; if ur wrong, the game will reset. you win once you hit 999. to chat in the chanel while a fizzbuz round is going on, use an underscore before your message (like _whats up). SPELLING MATTERS')
 
     @bot.command()
     async def fizzbuzz(ctx):
-        if ctx.channel.name != 'quib':
-            await ctx.send("This game is only allowed in the 'quib' channel.")
+        if ctx.channel.name != 'fizz-buzz':
+            await ctx.send("This game is only allowed in the 'fizz-buzz' channel.")
             return
 
         await ctx.send('Starting a new fizzbuzz round')
@@ -172,20 +172,25 @@ def run():
             print(answer)
 
             def check_message(message):
-                return message.channel.name == 'quib' and message.author != bot.user
+                return (
+                        message.channel.name == 'fizz-buzz'
+                        and message.author != bot.user
+                        and not message.content.startswith('_')
+                )
 
             user_answer = await bot.wait_for('message', check=check_message)
             user_answer_list = user_answer.content.split(' ')
             print(user_answer_list)
 
             if check_answers(user_answer_list, answer_list):
-                    await ctx.send('correct')
+                await ctx.send('correct')
             else:
                 await ctx.send(
-                    'incorrect answer. if you would like to play again, run the fizzbuzz command once more.')
+                    'incorrect answer. if you would like to play again, run the fizzbuzz command once more.'
+                )
                 break
 
-    bot.run('tokem')
+    bot.run('token')
 
 if __name__ == '__main__':
     run()
