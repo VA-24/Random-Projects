@@ -95,27 +95,55 @@ def multiple_prime_factors(n):
 def fizzbuzz_extended(n):
     output = ''
 
-    if n % 5 == 0 or '5' in str(n):
-        output += 'bang '
-    if n % 7 == 0 or '7' in str(n):
-        output += 'buzz '
-    if is_prime(n):
-        output += 'crash '
-    if is_fibonacci(n):
-        output += 'fibbi '
-    if is_sum_of_squares(n):
-        output += 'squawk '
-    if is_square_free(n):
-        output += 'whizz '
-    if multiple_prime_factors(n):
-        output += 'pop '
-    if is_a_power(n):
-        output += 'zip '
-    if prime_factors(n):
-        output += 'triple '
-
-    if not output:
-        output = str(n)
+    if n < 20:
+        if n % 5 == 0 or '5' in str(n):
+            output += 'bang '
+        if n % 7 == 0 or '7' in str(n):
+            output += 'buzz '
+        if is_prime(n):
+            output += 'crash '
+        if is_fibonacci(n):
+            output += 'fibbi '
+        if not output:
+            output = str(n)
+    if n >= 20 and n < 40:
+        if n % 5 == 0 or '5' in str(n):
+            output += 'bang '
+        if n % 7 == 0 or '7' in str(n):
+            output += 'buzz '
+        if is_prime(n):
+            output += 'crash '
+        if is_fibonacci(n):
+            output += 'fibbi '
+        if multiple_prime_factors(n):
+            output += 'pop '
+        if is_square_free(n):
+            output += 'whizz'
+        if is_a_power(n):
+            output += 'zip '
+        if not output:
+            output = str(n)
+    if n >= 40:
+        if n % 5 == 0 or '5' in str(n):
+            output += 'bang '
+        if n % 7 == 0 or '7' in str(n):
+            output += 'buzz '
+        if is_prime(n):
+            output += 'crash '
+        if is_fibonacci(n):
+            output += 'fibbi '
+        if multiple_prime_factors(n):
+            output += 'pop '
+        if is_square_free(n):
+            output += 'whizz'
+        if is_a_power(n):
+            output += 'zip '
+        if is_sum_of_squares(n):
+            output += 'squawk '
+        if prime_factors(n):
+            output += 'triple '
+        if not output:
+            output = str(n)
 
     return output.strip()
 
@@ -154,7 +182,7 @@ def run():
     @bot.command()
     async def rules(ctx):
         await ctx.send('rules for fizzbuzz: https://media.discordapp.net/attachments/1167631521193152523/1170593298793119834/IMG_9764.jpg?width=556&height=741')
-        await ctx.send('to play the game, type whatever buzz words apply to the number in chat (order doesnt matter). if ur right, the bot will continue; if ur wrong, the game will reset. you win once you hit 999. to chat in the chanel while a fizzbuz round is going on, use an underscore before your message (like _whats up). SPELLING MATTERS')
+        await ctx.send('to play the game, type answer: then whatever buzz words apply to the number in chat (order doesnt matter). if ur right, the bot will continue; as you go on, more buzz words are gradually added. SPELLING MATTERS')
 
     @bot.command()
     async def fizzbuzz(ctx):
@@ -166,6 +194,12 @@ def run():
 
         for i in range(1, 1000):
             await ctx.send(f'current number: {i}')
+            if i == 1:
+                await ctx.send('starting on 1, the only buzz words in play are bang, buzz, crash, fibbi')
+            elif i == 20:
+                await ctx.send('in addition to bang, buzz, crash, and fibbi, pop, zip, and whizz are in play now')
+            elif i == 40:
+                await ctx.send('in addition to bang, buzz, crash, fibbi, pop, zip, and whizz, squawk and triple - the last two buzzwords - are in play now.')
             answer = fizzbuzz_extended(i)
             answer_list = answer.split(' ')
             print(answer)
@@ -174,19 +208,18 @@ def run():
                 return (
                         message.channel.name == 'fizz-buzz'
                         and message.author != bot.user
-                        and not message.content.startswith('_')
+                        and message.content.startswith('answer: ')
                 )
 
             user_answer = await bot.wait_for('message', check=check_message)
-            user_answer_list = user_answer.content.split(' ')
+            user_answer_list = user_answer.content.split(' ')[1:]
             print(user_answer_list)
 
             if check_answers(user_answer_list, answer_list):
-                await ctx.send('correct')
+                await user_answer.add_reaction('✅')
             else:
-                await ctx.send(
-                    'incorrect answer. if you would like to play again, run the fizzbuzz command once more.'
-                )
+                await user_answer.add_reaction('❌')
+                await ctx.send('wrong! to restart the game, re-run the fizzbuzz command')
                 break
 
     bot.run('token')
