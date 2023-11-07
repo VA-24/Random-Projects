@@ -210,7 +210,7 @@ def run():
 
             def check_message(message):
                 return (
-                        message.channel.name == 'fizz-buzz'
+                        message.channel == ctx.channel
                         and message.author != bot.user
                         and message.content.startswith('answer: ')
                 )
@@ -244,7 +244,7 @@ def run():
 
             def check_message(message, ctx):
                 return (
-                        message.channel.name == 'fizz-buzz'
+                        message.channel == ctx.channel
                         and message.author != bot.user
                         and message.author == ctx.author
                 )
