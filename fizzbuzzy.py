@@ -1,6 +1,9 @@
 from collections import Counter
 import discord
 from discord.ext import commands
+import json
+import random
+import asyncio
 
 def is_prime(n):
     if n <= 1:
@@ -167,7 +170,7 @@ def run():
     intents.members = True
     intents.guilds = True
     bot = commands.Bot(command_prefix='~', intents=intents)
-    current_number = 1
+
 
     @bot.event
     async def on_ready():
@@ -186,6 +189,7 @@ def run():
 
     @bot.command()
     async def fizzbuzz(ctx):
+
         if ctx.channel.name != 'fizz-buzz':
             await ctx.send("This game is only allowed in the 'fizz-buzz' channel.")
             return
@@ -222,7 +226,49 @@ def run():
                 await ctx.send('wrong! to restart the game, re-run the fizzbuzz command')
                 break
 
+    @bot.command()
+    async def countdown(ctx):
+
+        with open('questions.json', 'r') as file:
+            questions = json.load(file)
+
+        question_list = questions['questions']
+        score = 0
+
+        while True:
+            random_question = random.choice(question_list)
+            print(random_question['answer'])
+
+            await ctx.send(random_question['url'])
+            await ctx.send('you have 45 seconds to answer')
+
+            def check_message(message, ctx):
+                return (
+                        message.channel.name == 'fizz-buzz'
+                        and message.author != bot.user
+                        and message.author == ctx.author
+                )
+
+            try:
+                user_answer = await bot.wait_for('message', check=lambda message: check_message(message, ctx), timeout=45.0)
+                if user_answer.content == random_question['answer']:
+                    await user_answer.add_reaction('✅')
+                    question_list.remove(random_question)
+                    score += 1
+                    print('length of list: ', str(len(question_list)))
+                else:
+                    await user_answer.add_reaction('❌')
+            except asyncio.TimeoutError:
+                await ctx.send('out of time! try again')
+                continue
+
+            if user_answer.content == "~end":
+                await ctx.send('thanks for playing! you answered ' + str(score) + ' questions correctly')
+                break
+
+
     bot.run('token')
+
 
 if __name__ == '__main__':
     run()
